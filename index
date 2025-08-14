@@ -1,483 +1,467 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Stirling Engine Calculator</title>
-   <!-- Use Tailwind CSS for a clean, modern look -->
-   <script src="https://cdn.tailwindcss.com"></script>
-   <style>
-       /* Custom styles for the tooltip-like functionality */
-       .tooltip-container {
-           position: relative;
-       }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stirling Engine Calculator</title>
+    <!-- Use Tailwind CSS for a clean, modern look -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the tooltip-like functionality */
+        .tooltip-container {
+            position: relative;
+        }
 
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px; /* Center the tooltip */
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
 
-       .tooltip-text {
-           visibility: hidden;
-           background-color: #333;
-           color: #fff;
-           text-align: center;
-           border-radius: 6px;
-           padding: 5px 10px;
-           position: absolute;
-           z-index: 10;
-           bottom: 125%;
-           left: 50%;
-           margin-left: -150px; /* Center the tooltip */
-           white-space: nowrap;
-           opacity: 0;
-           transition: opacity 0.3s;
-       }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
 
-
-       .tooltip-container:hover .tooltip-text {
-           visibility: visible;
-           opacity: 1;
-       }
-
-
-       /* Ensure canvas scales responsively */
-       canvas {
-           display: block;
-           width: 100%;
-           height: 100%;
-       }
-   </style>
+        /* Ensure canvas scales responsively */
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body class="bg-gray-200 font-sans p-4">
 
-
-   <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-8 my-8">
-       <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Stirling Engine Power Calculator</h1>
-       <p class="text-center text-gray-600 mb-8">
-           Enter your engine's specifications to estimate its performance.
-       </p>
-
-
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-           <!-- Inputs Section -->
-           <div class="space-y-4">
-               <h2 class="text-xl font-semibold mb-4 text-blue-700">Input Parameters</h2>
-
-
-               <!-- Piston Diameter -->
-               <div class="tooltip-container">
-                   <label for="pistonDiameter" class="block text-gray-700 font-medium cursor-pointer">Piston Diameter (mm) <span id="pistonDiameterIn" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       The diameter of the power piston.
-                   </div>
-                   <input type="number" id="pistonDiameter" value="100" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Piston Stroke -->
-               <div class="tooltip-container">
-                   <label for="pistonStroke" class="block text-gray-700 font-medium cursor-pointer">Piston Stroke (mm) <span id="pistonStrokeIn" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       Total travel of the power piston.
-                   </div>
-                   <input type="number" id="pistonStroke" value="140" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Displacer Diameter -->
-               <div class="tooltip-container">
-                   <label for="displacerDiameter" class="block text-gray-700 font-medium cursor-pointer">Displacer Diameter (mm) <span id="displacerDiameterIn" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       The diameter of the displacer piston.
-                   </div>
-                   <input type="number" id="displacerDiameter" value="120" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Displacer Stroke -->
-               <div class="tooltip-container">
-                   <label for="displacerStroke" class="block text-gray-700 font-medium cursor-pointer">Displacer Stroke (mm) <span id="displacerStrokeIn" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       Total travel of the displacer piston.
-                   </div>
-                   <input type="number" id="displacerStroke" value="120" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Hot End Temperature -->
-               <div class="tooltip-container">
-                   <label for="hotEndTemp" class="block text-gray-700 font-medium cursor-pointer">Hot End Temperature (K) <span id="hotEndTempF" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       Absolute temperature of the hot space.
-                   </div>
-                   <input type="number" id="hotEndTemp" value="644" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Cold End Temperature -->
-               <div class="tooltip-container">
-                   <label for="coldEndTemp" class="block text-gray-700 font-medium cursor-pointer">Cold End Temperature (K) <span id="coldEndTempF" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       Absolute temperature of the cold space.
-                   </div>
-                   <input type="number" id="coldEndTemp" value="294" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Dead Air Space -->
-               <div class="tooltip-container">
-                   <label for="deadAirSpace" class="block text-gray-700 font-medium cursor-pointer">Dead Air Space ($mm^3$) <span id="deadAirSpaceIn3" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       Total volume of gas passages (regenerator, etc.).
-                   </div>
-                   <input type="number" id="deadAirSpace" value="1500000" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-              
-               <!-- Engine Speed -->
-               <div class="tooltip-container">
-                   <label for="engineSpeed" class="block text-gray-700 font-medium cursor-pointer">Engine Speed (Hz) <span id="engineSpeedRPM" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       Revolutions per second. This value is used to calculate total power output.
-                   </div>
-                   <input type="number" id="engineSpeed" value="5.83" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Baseline Pressure -->
-               <div class="tooltip-container">
-                   <label for="baselinePressure" class="block text-gray-700 font-medium cursor-pointer">Baseline Pressure (Pa) <span id="baselinePressurePSI" class="text-xs text-gray-500"></span></label>
-                   <div class="tooltip-text">
-                       Average cycle pressure (e.g., atmospheric pressure).
-                   </div>
-                   <input type="number" id="baselinePressure" value="172369" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-
-
-               <!-- Phase Angle -->
-               <div class="tooltip-container">
-                   <label for="phaseAngle" class="block text-gray-700 font-medium cursor-pointer">Phase Angle (Degrees)</label>
-                   <div class="tooltip-text">
-                       The phase difference between the piston and displacer crank angles.
-                   </div>
-                   <input type="number" id="phaseAngle" value="90" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
-               </div>
-           </div>
-
-
-           <!-- Outputs and Graph Section -->
-           <div class="space-y-8">
-               <div>
-                   <h2 class="text-xl font-semibold mb-4 text-green-700">Estimated Outputs (from Schmidt Analysis)</h2>
-                   <div class="grid grid-cols-1 gap-4">
-                       <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
-                           <label class="block text-gray-700 font-medium">Net Power Output (J) per cycle</label>
-                           <span id="powerOutputPerCycle" class="text-2xl font-bold text-green-700">0.00</span>
-                       </div>
-                       <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
-                           <label class="block text-gray-700 font-medium">Net Power (W)</label>
-                           <span id="totalPowerOutput" class="text-2xl font-bold text-green-700">0.00</span>
-                       </div>
-                       <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
-                           <label class="block text-gray-700 font-medium">Max Pressure</label>
-                           <span id="maxPressure" class="text-2xl font-bold text-green-700">0.00 Pa</span>
-                           <span id="maxPressurePSI" class="text-base text-gray-500 ml-2">(0.00 PSI)</span>
-                       </div>
-                       <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
-                           <label class="block text-gray-700 font-medium">Min Pressure</label>
-                           <span id="minPressure" class="text-2xl font-bold text-green-700">0.00 Pa</span>
-                           <span id="minPressurePSI" class="text-base text-gray-500 ml-2">(0.00 PSI)</span>
-                       </div>
-                   </div>
-               </div>
-
-
-               <!-- Speed Estimation Section -->
-               <div>
-                   <h2 class="text-xl font-semibold mb-4 text-purple-700">Speed Estimation Analysis</h2>
-                   <div class="space-y-4">
-                       <div class="tooltip-container">
-                           <label for="resistiveTorque" class="block text-gray-700 font-medium cursor-pointer">Total Resistive Torque (N·m)</label>
-                           <div class="tooltip-text">
-                               The total friction and load on the engine's output shaft.
-                           </div>
-                           <input type="number" id="resistiveTorque" value="12" class="mt-1 block w-full px-3 py-2 border-2 border-purple-500 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 bg-purple-50 sm:text-sm">
-                       </div>
-                       <div class="p-4 bg-purple-50 border-2 border-purple-500 rounded-md shadow-sm">
-                           <label class="block text-gray-700 font-medium">Estimated Speed (Hz)</label>
-                           <span id="estimatedSpeedHz" class="text-2xl font-bold text-purple-700">0.00</span>
-                       </div>
-                       <div class="p-4 bg-purple-50 border-2 border-purple-500 rounded-md shadow-sm">
-                           <label class="block text-gray-700 font-medium">Estimated Speed (RPM)</label>
-                           <span id="estimatedSpeedRPM" class="text-2xl font-bold text-purple-700">0.00</span>
-                       </div>
-                   </div>
-               </div>
-
-
-               <!-- Pressure-Volume Curve Graph -->
-               <div>
-                   <h2 class="text-xl font-semibold mb-4 text-gray-700">Pressure-Volume Curve</h2>
-                   <div class="relative bg-gray-100 rounded-md shadow-inner p-2 h-80">
-                       <canvas id="pvCurve" class="border border-gray-300"></canvas>
-                   </div>
-               </div>
-           </div>
-       </div>
-
-
-       <!-- Detailed Output Table -->
-       <div class="mt-8">
-           <h2 class="text-xl font-semibold mb-4 text-gray-700">Pressure & Volume by Crank Angle</h2>
-           <div class="overflow-x-auto">
-               <table class="min-w-full divide-y divide-gray-200">
-                   <thead class="bg-gray-50">
-                       <tr>
-                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Angle (°)</th>
-                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Volume ($mm^3$)</th>
-                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pressure (Pa)</th>
-                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pressure (PSI)</th>
-                       </tr>
-                   </thead>
-                   <tbody id="pvTableBody" class="bg-white divide-y divide-gray-200">
-                       <!-- Data will be inserted here by JavaScript -->
-                   </tbody>
-               </table>
-           </div>
-       </div>
-   </div>
-
-
-   <script>
-       document.addEventListener('DOMContentLoaded', () => {
-           const inputs = document.querySelectorAll('input[type="number"]');
-           const powerOutputPerCycleSpan = document.getElementById('powerOutputPerCycle');
-           const totalPowerOutputSpan = document.getElementById('totalPowerOutput');
-           const maxPressureSpan = document.getElementById('maxPressure');
-           const minPressureSpan = document.getElementById('minPressure');
-           const maxPressurePSISpan = document.getElementById('maxPressurePSI');
-           const minPressurePSISpan = document.getElementById('minPressurePSI');
-           const pvCurveCanvas = document.getElementById('pvCurve');
-           const pvCurveContext = pvCurveCanvas.getContext('2d');
-           const pvTableBody = document.getElementById('pvTableBody');
-          
-           // Initial call to populate the calculator on page load
-           calculateStirling();
-
-
-           // Add event listeners to all input fields
-           inputs.forEach(input => {
-               input.addEventListener('input', calculateStirling);
-           });
-
-
-           // Specific listener for the new torque input
-           const resistiveTorqueInput = document.getElementById('resistiveTorque');
-           resistiveTorqueInput.addEventListener('input', calculateStirling);
-
-
-           function calculateStirling() {
-               try {
-                   // 1. Get Input Values
-                   const d_p = parseFloat(document.getElementById('pistonDiameter').value);
-                   const s_p = parseFloat(document.getElementById('pistonStroke').value);
-                   const d_d = parseFloat(document.getElementById('displacerDiameter').value);
-                   const s_d = parseFloat(document.getElementById('displacerStroke').value);
-                   const t_h = parseFloat(document.getElementById('hotEndTemp').value);
-                   const t_c = parseFloat(document.getElementById('coldEndTemp').value);
-                   const v_dead = parseFloat(document.getElementById('deadAirSpace').value);
-                   const n_freq = parseFloat(document.getElementById('engineSpeed').value);
-                   const p_base = parseFloat(document.getElementById('baselinePressure').value);
-                   const alpha_deg = parseFloat(document.getElementById('phaseAngle').value);
-                   const resistiveTorque = parseFloat(document.getElementById('resistiveTorque').value);
-
-
-                   // 2. Intermediate Calculations (Schmidt Analysis)
-                   const v_sp = Math.PI * Math.pow(d_p / 2, 2) * s_p;
-                   const v_sd = Math.PI * Math.pow(d_d / 2, 2) * s_d;
-                  
-                   const tau = t_c / t_h;
-                   const v_ratio = v_sd / v_sp;
-                   const dead_ratio = v_dead / v_sp;
-                   const alpha_rad = alpha_deg * (Math.PI / 180);
-
-
-                   const x = (1 / (1 + dead_ratio + tau * dead_ratio)) * Math.sqrt(
-                       Math.pow(tau + v_ratio * Math.cos(alpha_rad), 2) + Math.pow(v_ratio * Math.sin(alpha_rad), 2)
-                   );
-
-
-                   const p_max_ratio = (1 + x) / (1 - x);
-                  
-                   // 3. Main Output Calculations
-                   const p_min = (2 * p_base) / (1 + p_max_ratio);
-                   const p_max = p_min * p_max_ratio;
-                  
-                   // Work per cycle in Joules (J), which is power per cycle
-                   const workPerCycle = (p_max - p_min) * v_sp / (2 * 1e9); // 1e9 for mm^3 to m^3 conversion
-                  
-                   // Total power in Watts (W) = Joules per second
-                   const totalPower = workPerCycle * n_freq;
-
-
-                   // Pressure conversion to PSI (1 PSI = 6894.76 Pa)
-                   const p_min_psi = p_min / 6894.76;
-                   const p_max_psi = p_max / 6894.76;
-
-
-                   // 4. Update the main output spans
-                   powerOutputPerCycleSpan.textContent = totalPower > 0 ? workPerCycle.toFixed(4) : "0.00";
-                   totalPowerOutputSpan.textContent = totalPower > 0 ? totalPower.toFixed(2) : "0.00";
-                   maxPressureSpan.textContent = p_max.toFixed(2) + ' Pa';
-                   maxPressurePSISpan.textContent = '(' + p_max_psi.toFixed(2) + ' PSI)';
-                   minPressureSpan.textContent = p_min.toFixed(2) + ' Pa';
-                   minPressurePSISpan.textContent = '(' + p_min_psi.toFixed(2) + ' PSI)';
-
-
-                   // 5. Speed Estimation Analysis
-                   const estimatedSpeedHzSpan = document.getElementById('estimatedSpeedHz');
-                   const estimatedSpeedRPMSpan = document.getElementById('estimatedSpeedRPM');
-
-
-                   let estimatedHz = 0;
-                   let estimatedRPM = 0;
-                  
-                   if (resistiveTorque > 0 && totalPower > 0) {
-                       const angularVelocity_rad_per_s = totalPower / resistiveTorque;
-                       estimatedHz = angularVelocity_rad_per_s / (2 * Math.PI);
-                       estimatedRPM = estimatedHz * 60;
-                   }
-
-
-                   estimatedSpeedHzSpan.textContent = estimatedHz.toFixed(2);
-                   estimatedSpeedRPMSpan.textContent = estimatedRPM.toFixed(0);
-
-
-
-
-                   // 6. Convert and update US units for inputs
-                   const in_per_mm = 1 / 25.4;
-                   const f_per_k = 9/5;
-                   const c_to_f_offset = -459.67; // -273.15 * 9/5 + 32
-                   const psi_per_pa = 1 / 6894.76;
-                  
-                   document.getElementById('pistonDiameterIn').textContent = '(' + (d_p * in_per_mm).toFixed(2) + ' in)';
-                   document.getElementById('pistonStrokeIn').textContent = '(' + (s_p * in_per_mm).toFixed(2) + ' in)';
-                   document.getElementById('displacerDiameterIn').textContent = '(' + (d_d * in_per_mm).toFixed(2) + ' in)';
-                   document.getElementById('displacerStrokeIn').textContent = '(' + (s_d * in_per_mm).toFixed(2) + ' in)'; // FIX: Corrected variable from in_d_mm to in_per_mm
-                   document.getElementById('hotEndTempF').textContent = '(' + (t_h * f_per_k + c_to_f_offset).toFixed(0) + ' °F)';
-                   document.getElementById('coldEndTempF').textContent = '(' + (t_c * f_per_k + c_to_f_offset).toFixed(0) + ' °F)';
-                   document.getElementById('deadAirSpaceIn3').textContent = '(' + (v_dead * Math.pow(in_per_mm, 3)).toFixed(2) + ' in³)';
-                   document.getElementById('engineSpeedRPM').textContent = '(' + (n_freq * 60).toFixed(0) + ' RPM)';
-                   document.getElementById('baselinePressurePSI').textContent = '(' + (p_base * psi_per_pa).toFixed(2) + ' PSI)';
-                  
-                   // 7. Generate data for P-V curve and table
-                   const pvData = [];
-                   pvTableBody.innerHTML = ''; // Clear previous table data
-                  
-                   let minTotalVolume = Infinity;
-                   let maxTotalVolume = -Infinity;
-                   let minPressure = Infinity;
-                   let maxPressure = -Infinity;
-
-
-                   // Store all calculated points to find min/max for scaling the graph
-                   const allPoints = [];
-
-
-                   for (let angle = 0; angle <= 360; angle += 10) {
-                       const angle_rad = angle * (Math.PI / 180);
-                      
-                       const v_p = (v_sp / 2) * (1 - Math.cos(angle_rad));
-                       const v_d = (v_sd / 2) * (1 - Math.cos(angle_rad + alpha_rad));
-                       const v_total = v_dead + v_p + v_d;
-                      
-                       // Pressure calculation from Schmidt's analysis
-                       const p_schmidt = p_base * (v_sp + v_sd + v_dead) / (v_sp*(1-Math.cos(angle_rad))/(2*tau) + v_sd*(1-Math.cos(angle_rad+alpha_rad))/2 + v_dead);
-                       const p_schmidt_psi = p_schmidt / 6894.76;
-
-
-                       allPoints.push({volume: v_total, pressure: p_schmidt});
-
-
-                       // Update min/max for graph scaling
-                       minTotalVolume = Math.min(minTotalVolume, v_total);
-                       maxTotalVolume = Math.max(maxTotalVolume, v_total);
-                       minPressure = Math.min(minPressure, p_schmidt);
-                       maxPressure = Math.max(maxPressure, p_schmidt);
-
-
-                       // Add to table
-                       const row = pvTableBody.insertRow();
-                       row.innerHTML = `
-                           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${angle}</td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${v_total.toFixed(2)}</td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p_schmidt.toFixed(2)}</td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p_schmidt_psi.toFixed(2)}</td>
-                       `;
-                   }
-
-
-                   // 8. Draw the P-V Curve
-                   pvCurveCanvas.width = pvCurveCanvas.offsetWidth;
-                   pvCurveCanvas.height = pvCurveCanvas.offsetHeight;
-                  
-                   pvCurveContext.clearRect(0, 0, pvCurveCanvas.width, pvCurveCanvas.height);
-                  
-                   const padding = 30; // Padding for the graph
-                   const scaleX = (pvCurveCanvas.width - 2 * padding) / (maxTotalVolume - minTotalVolume);
-                   const scaleY = (pvCurveCanvas.height - 2 * padding) / (maxPressure - minPressure);
-
-
-                   pvCurveContext.beginPath();
-                   pvCurveContext.strokeStyle = '#3b82f6';
-                   pvCurveContext.lineWidth = 2;
-                  
-                   allPoints.forEach((point, index) => {
-                       const x = padding + (point.volume - minTotalVolume) * scaleX;
-                       const y = pvCurveCanvas.height - padding - (point.pressure - minPressure) * scaleY;
-                      
-                       if (index === 0) {
-                           pvCurveContext.moveTo(x, y);
-                       } else {
-                           pvCurveContext.lineTo(x, y);
-                       }
-                   });
-
-
-                   pvCurveContext.closePath();
-                   pvCurveContext.stroke();
-                  
-                   // Draw axis labels
-                   pvCurveContext.fillStyle = '#6b7280';
-                   pvCurveContext.font = '10px Arial';
-                  
-                   // Y-axis Label
-                   pvCurveContext.save();
-                   pvCurveContext.translate(10, pvCurveCanvas.height / 2);
-                   pvCurveContext.rotate(-Math.PI / 2);
-                   pvCurveContext.fillText('Pressure (Pa)', 0, 0);
-                   pvCurveContext.restore();
-
-
-                   // X-axis Label
-                   pvCurveContext.textAlign = 'center';
-                   pvCurveContext.fillText('Volume (mm³)', pvCurveCanvas.width / 2, pvCurveCanvas.height - 5);
-                  
-                   // Y-axis min/max
-                   pvCurveContext.textAlign = 'right';
-                   pvCurveContext.fillText(minPressure.toFixed(0), padding - 5, pvCurveCanvas.height - padding + 5);
-                   pvCurveContext.fillText(maxPressure.toFixed(0), padding - 5, padding + 5);
-
-
-                   // X-axis min/max
-                   pvCurveContext.textAlign = 'center';
-                   pvCurveContext.fillText(minTotalVolume.toFixed(0), padding, pvCurveCanvas.height - padding + 15);
-                   pvCurveContext.fillText(maxTotalVolume.toFixed(0), pvCurveCanvas.width - padding, pvCurveCanvas.height - padding + 15);
-
-
-               } catch (error) {
-                   console.error("Calculation Error:", error);
-                   // You could display an error message to the user here
-               }
-           }
-       });
-   </script>
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-8 my-8">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Stirling Engine Power Calculator</h1>
+        <p class="text-center text-gray-600 mb-8">
+            Enter your engine's specifications to estimate its performance.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Inputs Section -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-semibold mb-4 text-blue-700">Input Parameters</h2>
+
+                <!-- Piston Diameter -->
+                <div class="tooltip-container">
+                    <label for="pistonDiameter" class="block text-gray-700 font-medium cursor-pointer">Piston Diameter (mm) <span id="pistonDiameterIn" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        The diameter of the power piston.
+                    </div>
+                    <input type="number" id="pistonDiameter" value="100" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Piston Stroke -->
+                <div class="tooltip-container">
+                    <label for="pistonStroke" class="block text-gray-700 font-medium cursor-pointer">Piston Stroke (mm) <span id="pistonStrokeIn" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        Total travel of the power piston.
+                    </div>
+                    <input type="number" id="pistonStroke" value="140" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Displacer Diameter -->
+                <div class="tooltip-container">
+                    <label for="displacerDiameter" class="block text-gray-700 font-medium cursor-pointer">Displacer Diameter (mm) <span id="displacerDiameterIn" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        The diameter of the displacer piston.
+                    </div>
+                    <input type="number" id="displacerDiameter" value="120" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Displacer Stroke -->
+                <div class="tooltip-container">
+                    <label for="displacerStroke" class="block text-gray-700 font-medium cursor-pointer">Displacer Stroke (mm) <span id="displacerStrokeIn" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        Total travel of the displacer piston.
+                    </div>
+                    <input type="number" id="displacerStroke" value="120" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Hot End Temperature -->
+                <div class="tooltip-container">
+                    <label for="hotEndTemp" class="block text-gray-700 font-medium cursor-pointer">Hot End Temperature (K) <span id="hotEndTempF" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        Absolute temperature of the hot space.
+                    </div>
+                    <input type="number" id="hotEndTemp" value="644" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Cold End Temperature -->
+                <div class="tooltip-container">
+                    <label for="coldEndTemp" class="block text-gray-700 font-medium cursor-pointer">Cold End Temperature (K) <span id="coldEndTempF" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        Absolute temperature of the cold space.
+                    </div>
+                    <input type="number" id="coldEndTemp" value="294" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Dead Air Space -->
+                <div class="tooltip-container">
+                    <label for="deadAirSpace" class="block text-gray-700 font-medium cursor-pointer">Dead Air Space ($mm^3$) <span id="deadAirSpaceIn3" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        Total volume of gas passages (regenerator, etc.).
+                    </div>
+                    <input type="number" id="deadAirSpace" value="1500000" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+                
+                <!-- Engine Speed -->
+                <div class="tooltip-container">
+                    <label for="engineSpeed" class="block text-gray-700 font-medium cursor-pointer">Engine Speed (Hz) <span id="engineSpeedRPM" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        Revolutions per second. This value is used to calculate total power output.
+                    </div>
+                    <input type="number" id="engineSpeed" value="5.83" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Baseline Pressure -->
+                <div class="tooltip-container">
+                    <label for="baselinePressure" class="block text-gray-700 font-medium cursor-pointer">Baseline Pressure (Pa) <span id="baselinePressurePSI" class="text-xs text-gray-500"></span></label>
+                    <div class="tooltip-text">
+                        Average cycle pressure (e.g., atmospheric pressure).
+                    </div>
+                    <input type="number" id="baselinePressure" value="172369" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+
+                <!-- Phase Angle -->
+                <div class="tooltip-container">
+                    <label for="phaseAngle" class="block text-gray-700 font-medium cursor-pointer">Phase Angle (Degrees)</label>
+                    <div class="tooltip-text">
+                        The phase difference between the piston and displacer crank angles.
+                    </div>
+                    <input type="number" id="phaseAngle" value="90" class="mt-1 block w-full px-3 py-2 border-2 border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-blue-50 sm:text-sm">
+                </div>
+            </div>
+
+            <!-- Outputs and Graph Section -->
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-green-700">Estimated Outputs (from Schmidt Analysis)</h2>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
+                            <label class="block text-gray-700 font-medium">Net Power Output (J) per cycle</label>
+                            <span id="powerOutputPerCycle" class="text-2xl font-bold text-green-700">0.00</span>
+                        </div>
+                        <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
+                            <label class="block text-gray-700 font-medium">Net Power (W)</label>
+                            <span id="totalPowerOutput" class="text-2xl font-bold text-green-700">0.00</span>
+                        </div>
+                        <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
+                            <label class="block text-gray-700 font-medium">Max Pressure</label>
+                            <span id="maxPressure" class="text-2xl font-bold text-green-700">0.00 Pa</span>
+                            <span id="maxPressurePSI" class="text-base text-gray-500 ml-2">(0.00 PSI)</span>
+                        </div>
+                        <div class="p-4 bg-green-50 border-2 border-green-500 rounded-md shadow-sm">
+                            <label class="block text-gray-700 font-medium">Min Pressure</label>
+                            <span id="minPressure" class="text-2xl font-bold text-green-700">0.00 Pa</span>
+                            <span id="minPressurePSI" class="text-base text-gray-500 ml-2">(0.00 PSI)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Speed Estimation Section -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-purple-700">Speed Estimation Analysis</h2>
+                    <div class="space-y-4">
+                        <div class="tooltip-container">
+                            <label for="resistiveTorque" class="block text-gray-700 font-medium cursor-pointer">Total Resistive Torque (N·m)</label>
+                            <div class="tooltip-text">
+                                The total friction and load on the engine's output shaft.
+                            </div>
+                            <input type="number" id="resistiveTorque" value="12" class="mt-1 block w-full px-3 py-2 border-2 border-purple-500 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 bg-purple-50 sm:text-sm">
+                        </div>
+                        <div class="p-4 bg-purple-50 border-2 border-purple-500 rounded-md shadow-sm">
+                            <label class="block text-gray-700 font-medium">Estimated Speed (Hz)</label>
+                            <span id="estimatedSpeedHz" class="text-2xl font-bold text-purple-700">0.00</span>
+                        </div>
+                        <div class="p-4 bg-purple-50 border-2 border-purple-500 rounded-md shadow-sm">
+                            <label class="block text-gray-700 font-medium">Estimated Speed (RPM)</label>
+                            <span id="estimatedSpeedRPM" class="text-2xl font-bold text-purple-700">0.00</span>
+                        </div>
+                        <button id="updateSpeedButton" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition-colors duration-200">
+                            Auto-Update Speed
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pressure-Volume Curve Graph -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Pressure-Volume Curve</h2>
+                    <div class="relative bg-gray-100 rounded-md shadow-inner p-2 h-80">
+                        <canvas id="pvCurve" class="border border-gray-300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Output Table -->
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Pressure & Volume by Crank Angle</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Angle (°)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Volume ($mm^3$)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pressure (Pa)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pressure (PSI)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pvTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            const powerOutputPerCycleSpan = document.getElementById('powerOutputPerCycle');
+            const totalPowerOutputSpan = document.getElementById('totalPowerOutput');
+            const maxPressureSpan = document.getElementById('maxPressure');
+            const minPressureSpan = document.getElementById('minPressure');
+            const maxPressurePSISpan = document.getElementById('maxPressurePSI');
+            const minPressurePSISpan = document.getElementById('minPressurePSI');
+            const pvCurveCanvas = document.getElementById('pvCurve');
+            const pvCurveContext = pvCurveCanvas.getContext('2d');
+            const pvTableBody = document.getElementById('pvTableBody');
+            
+            // New button for auto-updating speed
+            const updateSpeedButton = document.getElementById('updateSpeedButton');
+            
+            // Initial call to populate the calculator on page load
+            calculateStirling();
+
+            // Add event listeners to all input fields
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateStirling);
+            });
+
+            // Specific listener for the new torque input
+            const resistiveTorqueInput = document.getElementById('resistiveTorque');
+            resistiveTorqueInput.addEventListener('input', calculateStirling);
+            
+            // Event listener for the new button
+            updateSpeedButton.addEventListener('click', autoUpdateSpeed);
+
+            function autoUpdateSpeed() {
+                const engineSpeedInput = document.getElementById('engineSpeed');
+                const estimatedSpeedHzSpan = document.getElementById('estimatedSpeedHz');
+                
+                let currentEngineSpeed = parseFloat(engineSpeedInput.value);
+                let newEstimatedSpeed = parseFloat(estimatedSpeedHzSpan.textContent);
+                
+                // Perform a few iterations to let the values converge
+                for (let i = 0; i < 5; i++) {
+                    engineSpeedInput.value = newEstimatedSpeed;
+                    calculateStirling();
+                    newEstimatedSpeed = parseFloat(estimatedSpeedHzSpan.textContent);
+                }
+            }
+
+            function calculateStirling() {
+                try {
+                    // 1. Get Input Values
+                    const d_p = parseFloat(document.getElementById('pistonDiameter').value);
+                    const s_p = parseFloat(document.getElementById('pistonStroke').value);
+                    const d_d = parseFloat(document.getElementById('displacerDiameter').value);
+                    const s_d = parseFloat(document.getElementById('displacerStroke').value);
+                    const t_h = parseFloat(document.getElementById('hotEndTemp').value);
+                    const t_c = parseFloat(document.getElementById('coldEndTemp').value);
+                    const v_dead = parseFloat(document.getElementById('deadAirSpace').value);
+                    const n_freq = parseFloat(document.getElementById('engineSpeed').value);
+                    const p_base = parseFloat(document.getElementById('baselinePressure').value);
+                    const alpha_deg = parseFloat(document.getElementById('phaseAngle').value);
+                    const resistiveTorque = parseFloat(document.getElementById('resistiveTorque').value);
+
+                    // 2. Intermediate Calculations (Schmidt Analysis)
+                    const v_sp = Math.PI * Math.pow(d_p / 2, 2) * s_p;
+                    const v_sd = Math.PI * Math.pow(d_d / 2, 2) * s_d;
+                    
+                    const tau = t_c / t_h;
+                    const v_ratio = v_sd / v_sp;
+                    const dead_ratio = v_dead / v_sp;
+                    const alpha_rad = alpha_deg * (Math.PI / 180);
+
+                    const x = (1 / (1 + dead_ratio + tau * dead_ratio)) * Math.sqrt(
+                        Math.pow(tau + v_ratio * Math.cos(alpha_rad), 2) + Math.pow(v_ratio * Math.sin(alpha_rad), 2)
+                    );
+
+                    const p_max_ratio = (1 + x) / (1 - x);
+                    
+                    // 3. Main Output Calculations
+                    const p_min = (2 * p_base) / (1 + p_max_ratio);
+                    const p_max = p_min * p_max_ratio;
+                    
+                    // Work per cycle in Joules (J), which is power per cycle
+                    const workPerCycle = (p_max - p_min) * v_sp / (2 * 1e9); // 1e9 for mm^3 to m^3 conversion
+                    
+                    // Total power in Watts (W) = Joules per second
+                    // This is the power output AT THE GIVEN ENGINE SPEED
+                    const totalPower = workPerCycle * n_freq;
+
+                    // Pressure conversion to PSI (1 PSI = 6894.76 Pa)
+                    const p_min_psi = p_min / 6894.76;
+                    const p_max_psi = p_max / 6894.76;
+
+                    // 4. Update the main output spans
+                    powerOutputPerCycleSpan.textContent = totalPower > 0 ? workPerCycle.toFixed(4) : "0.00";
+                    totalPowerOutputSpan.textContent = totalPower > 0 ? totalPower.toFixed(2) : "0.00";
+                    maxPressureSpan.textContent = p_max.toFixed(2) + ' Pa';
+                    maxPressurePSISpan.textContent = '(' + p_max_psi.toFixed(2) + ' PSI)';
+                    minPressureSpan.textContent = p_min.toFixed(2) + ' Pa';
+                    minPressurePSISpan.textContent = '(' + p_min_psi.toFixed(2) + ' PSI)';
+
+                    // 5. Speed Estimation Analysis
+                    const estimatedSpeedHzSpan = document.getElementById('estimatedSpeedHz');
+                    const estimatedSpeedRPMSpan = document.getElementById('estimatedSpeedRPM');
+                    
+                    let estimatedHz = 0;
+                    let estimatedRPM = 0;
+                    
+                    // Calculate the engine speed where totalPower = resistiveTorque * angularVelocity
+                    if (resistiveTorque > 0 && totalPower > 0) {
+                        const angularVelocity_rad_per_s = totalPower / resistiveTorque;
+                        estimatedHz = angularVelocity_rad_per_s / (2 * Math.PI);
+                        estimatedRPM = estimatedHz * 60;
+                    }
+
+                    estimatedSpeedHzSpan.textContent = estimatedHz > 0 ? estimatedHz.toFixed(2) : "0.00";
+                    estimatedSpeedRPMSpan.textContent = estimatedRPM > 0 ? estimatedRPM.toFixed(0) : "0.00";
+
+
+                    // 6. Convert and update US units for inputs
+                    const in_per_mm = 1 / 25.4;
+                    const f_per_k = 9/5;
+                    const c_to_f_offset = -459.67; // -273.15 * 9/5 + 32
+                    const psi_per_pa = 1 / 6894.76;
+                    
+                    document.getElementById('pistonDiameterIn').textContent = '(' + (d_p * in_per_mm).toFixed(2) + ' in)';
+                    document.getElementById('pistonStrokeIn').textContent = '(' + (s_p * in_per_mm).toFixed(2) + ' in)';
+                    document.getElementById('displacerDiameterIn').textContent = '(' + (d_d * in_per_mm).toFixed(2) + ' in)';
+                    document.getElementById('displacerStrokeIn').textContent = '(' + (s_d * in_per_mm).toFixed(2) + ' in)';
+                    document.getElementById('hotEndTempF').textContent = '(' + (t_h * f_per_k + c_to_f_offset).toFixed(0) + ' °F)';
+                    document.getElementById('coldEndTempF').textContent = '(' + (t_c * f_per_k + c_to_f_offset).toFixed(0) + ' °F)';
+                    document.getElementById('deadAirSpaceIn3').textContent = '(' + (v_dead * Math.pow(in_per_mm, 3)).toFixed(2) + ' in³)';
+                    document.getElementById('engineSpeedRPM').textContent = '(' + (n_freq * 60).toFixed(0) + ' RPM)';
+                    document.getElementById('baselinePressurePSI').textContent = '(' + (p_base * psi_per_pa).toFixed(2) + ' PSI)';
+                    
+                    // 7. Generate data for P-V curve and table
+                    pvTableBody.innerHTML = ''; // Clear previous table data
+                    
+                    let minTotalVolume = Infinity;
+                    let maxTotalVolume = -Infinity;
+                    let minPressure = Infinity;
+                    let maxPressure = -Infinity;
+
+                    // Store all calculated points to find min/max for scaling the graph
+                    const allPoints = [];
+
+                    for (let angle = 0; angle <= 360; angle += 10) {
+                        const angle_rad = angle * (Math.PI / 180);
+                        
+                        const v_p = (v_sp / 2) * (1 - Math.cos(angle_rad));
+                        const v_d = (v_sd / 2) * (1 - Math.cos(angle_rad + alpha_rad));
+                        const v_total = v_dead + v_p + v_d;
+                        
+                        // Pressure calculation from Schmidt's analysis
+                        const p_schmidt_numerator = p_base * (v_sp + v_sd + v_dead);
+                        const p_schmidt_denominator = (v_sp/2)*(1-Math.cos(angle_rad)) + (v_sd/2)*(1-Math.cos(angle_rad+alpha_rad)) + v_dead;
+                        const p_schmidt = p_schmidt_numerator / p_schmidt_denominator;
+                        const p_schmidt_psi = p_schmidt / 6894.76;
+                        
+                        allPoints.push({volume: v_total, pressure: p_schmidt});
+
+                        // Update min/max for graph scaling
+                        minTotalVolume = Math.min(minTotalVolume, v_total);
+                        maxTotalVolume = Math.max(maxTotalVolume, v_total);
+                        minPressure = Math.min(minPressure, p_schmidt);
+                        maxPressure = Math.max(maxPressure, p_schmidt);
+
+                        // Add to table
+                        const row = pvTableBody.insertRow();
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${angle}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${v_total.toFixed(2)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p_schmidt.toFixed(2)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p_schmidt_psi.toFixed(2)}</td>
+                        `;
+                    }
+
+                    // 8. Draw the P-V Curve
+                    pvCurveCanvas.width = pvCurveCanvas.offsetWidth;
+                    pvCurveCanvas.height = pvCurveCanvas.offsetHeight;
+                    
+                    pvCurveContext.clearRect(0, 0, pvCurveCanvas.width, pvCurveCanvas.height);
+                    
+                    const padding = 30; // Padding for the graph
+                    const scaleX = (pvCurveCanvas.width - 2 * padding) / (maxTotalVolume - minTotalVolume);
+                    const scaleY = (pvCurveCanvas.height - 2 * padding) / (maxPressure - minPressure);
+
+                    pvCurveContext.beginPath();
+                    pvCurveContext.strokeStyle = '#3b82f6';
+                    pvCurveContext.lineWidth = 2;
+                    
+                    allPoints.forEach((point, index) => {
+                        const x = padding + (point.volume - minTotalVolume) * scaleX;
+                        const y = pvCurveCanvas.height - padding - (point.pressure - minPressure) * scaleY;
+                        
+                        if (index === 0) {
+                            pvCurveContext.moveTo(x, y);
+                        } else {
+                            pvCurveContext.lineTo(x, y);
+                        }
+                    });
+
+                    pvCurveContext.closePath();
+                    pvCurveContext.stroke();
+                    
+                    // Draw axis labels
+                    pvCurveContext.fillStyle = '#6b7280';
+                    pvCurveContext.font = '10px Arial';
+                    
+                    // Y-axis Label
+                    pvCurveContext.save();
+                    pvCurveContext.translate(10, pvCurveCanvas.height / 2);
+                    pvCurveContext.rotate(-Math.PI / 2);
+                    pvCurveContext.fillText('Pressure (Pa)', 0, 0);
+                    pvCurveContext.restore();
+
+                    // X-axis Label
+                    pvCurveContext.textAlign = 'center';
+                    pvCurveContext.fillText('Volume (mm³)', pvCurveCanvas.width / 2, pvCurveCanvas.height - 5);
+                    
+                    // Y-axis min/max
+                    pvCurveContext.textAlign = 'right';
+                    pvCurveContext.fillText(minPressure.toFixed(0), padding - 5, pvCurveCanvas.height - padding + 5);
+                    pvCurveContext.fillText(maxPressure.toFixed(0), padding - 5, padding + 5);
+
+                    // X-axis min/max
+                    pvCurveContext.textAlign = 'center';
+                    pvCurveContext.fillText(minTotalVolume.toFixed(0), padding, pvCurveCanvas.height - padding + 15);
+                    pvCurveContext.fillText(maxTotalVolume.toFixed(0), pvCurveCanvas.width - padding, pvCurveCanvas.height - padding + 15);
+
+                } catch (error) {
+                    console.error("Calculation Error:", error);
+                    // You could display an error message to the user here
+                }
+            }
+        });
+    </script>
 </body>
 </html>
